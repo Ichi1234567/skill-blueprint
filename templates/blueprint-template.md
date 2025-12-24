@@ -1,6 +1,7 @@
 # Blueprint: [功能名稱]
 
 **建立時間**: YYYY-MM-DD
+**類型**: feat
 **狀態**: Draft
 
 ## 功能描述

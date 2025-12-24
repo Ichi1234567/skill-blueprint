@@ -11,16 +11,33 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 
 1. **載入藍圖**
 
-   - 讀取 `.blueprint/current.md`
-   - 如果不存在：
-     ```
-     ❌ 找不到藍圖檔案
+   **1.0 自動遷移舊格式（向下相容）**
 
-     請先執行 /blueprint-feat "功能描述" 來建立藍圖
+   - 首先檢查 `.blueprint/current.md` 是否存在
+   - 如果存在：
+     - 偵測到舊格式，自動遷移為 `current-feat.md`
+     - 使用 Read 工具讀取內容
+     - 使用 Write 工具寫入 `current-feat.md`
+     - 使用 Bash 重新命名：`mv .blueprint/current.md .blueprint/current.md.old`
+     - 在輸出中提示：「✓ 已自動遷移舊藍圖為新格式」
+
+   **1.1 讀取藍圖檔案**
+
+   - 嘗試讀取藍圖檔案（依照優先順序）：
+     1. `.blueprint/current-feat.md`（功能開發）
+     2. `.blueprint/current-idea.md`（想法探索）
+     3. `.blueprint/current-debug.md`（問題修復）
+   - 如果都不存在：
+     ```
+     ❌ 找不到進行中的藍圖
+
+     請先建立藍圖：
+     - /blueprint-feat "功能描述" - 建立功能開發藍圖
 
      範例：
      /blueprint-feat "實作使用者登入功能"
      ```
+   - 記錄當前藍圖類型（feat/idea/debug）和檔案路徑供後續步驟使用
 
 2. **解析階段狀態**
 
@@ -76,9 +93,19 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
    ✓ 階段 2: [名稱]
    ✓ 階段 3: [名稱]
 
-   建議：
-   - 手動更新藍圖狀態為 "Completed"
-   - 執行 /blueprint-feat 開始新的藍圖（舊的會自動歸檔）
+   **接下來要歸檔這個藍圖嗎？**
+
+   我可以幫你：
+   1. 更新藍圖狀態為 "Completed"
+   2. 生成歸檔檔名並移動到 archive/
+      格式：{建立日期}-{類型}-{slug}.md
+      例如：2025-12-24-feat-user-auth.md
+
+   回覆「歸檔」或「完成歸檔」，我會自動處理。
+
+   或者：
+   - 自己手動更新狀態為 "Completed"
+   - 執行 /blueprint-feat 開始新藍圖時會提示歸檔
    ```
 
    **情況 B：有進行中的階段**
@@ -323,6 +350,62 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
    以下階段被標記為複雜，執行時建議細化：
    - 階段 3: [名稱] - [複雜原因]
    ```
+
+## AI 主動協助歸檔藍圖
+
+當使用者回覆「歸檔」、「完成歸檔」或類似訊息時：
+
+### 執行步驟
+
+1. **讀取藍圖資訊**
+   - 從藍圖檔案讀取：功能名稱、建立時間、藍圖類型（從檔名判斷）
+   - 檢查藍圖狀態是否為 "Completed"
+
+2. **更新狀態（如果尚未完成）**
+   - 如果狀態不是 "Completed"，使用 Edit 工具更新為 "Completed"
+   - 在「檢查記錄」區段加上完成記錄
+
+3. **生成歸檔檔名**
+   - 格式：`{建立日期}-{類型}-{slug}.md`
+   - slug 生成規則：
+     - 從功能名稱轉換
+     - 轉小寫（中文保留、英文轉小寫）
+     - 空格和特殊字元改為 `-`
+     - 移除連續的 `-`
+     - 範例：
+       - "使用者認證系統" → "使用者認證系統"
+       - "User Authentication System" → "user-authentication-system"
+       - "API 重構 v2" → "api-重構-v2"
+
+4. **執行歸檔**
+   - 確保 `.blueprint/archive/` 目錄存在（使用 Bash: `mkdir -p .blueprint/archive`）
+   - 使用 Bash 移動檔案：`mv .blueprint/current-{type}.md .blueprint/archive/{檔名}`
+   - 回報：
+     ```
+     ✓ 藍圖已歸檔
+
+     檔案：.blueprint/archive/{檔名}
+     類型：{類型}
+     功能：{功能名稱}
+
+     現在可以開始新的藍圖了！
+     ```
+
+### 範例
+
+使用者說「歸檔」時：
+```
+讀取藍圖：使用者認證系統（建立於 2025-12-24）
+生成檔名：2025-12-24-feat-使用者認證系統.md
+
+✓ 藍圖已歸檔
+
+檔案：.blueprint/archive/2025-12-24-feat-使用者認證系統.md
+類型：功能開發 (feat)
+功能：使用者認證系統
+
+現在可以開始新的藍圖了！
+```
 
 ## AI 主動協助更新狀態（混合模式）
 
