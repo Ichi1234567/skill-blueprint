@@ -54,52 +54,57 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
 
 4. **檢查現有藍圖**
 
-   **4.0 自動遷移舊格式（向下相容）**
-
    - 檢查 `.blueprint/current.md` 是否存在
-   - 如果存在：
-     ```
-     偵測到舊格式藍圖：.blueprint/current.md
-     自動遷移為新格式 (current-feat.md)...
-     ```
-   - 執行遷移：
-     - 使用 Read 工具讀取 `current.md` 內容
-     - 使用 Write 工具寫入 `current-feat.md`
-     - 使用 Bash 重新命名舊檔案：`mv .blueprint/current.md .blueprint/current.md.old`
-     - 回報：「✓ 已遷移：current.md → current-feat.md（舊檔案備份為 current.md.old）」
-
-   - 檢查 `.blueprint/current-feat.md` 是否存在
    - 如果存在且狀態不是 "Completed"：
      ```
-     ⚠️ 已有進行中的功能藍圖
+     ⚠️ 已有進行中的藍圖
 
-     目前藍圖：[功能名稱]
+     目前藍圖：[功能名稱] ([類型])
      狀態：[Draft/In Progress]
 
      選項：
-     A. 覆蓋（遺失目前進度）
-     B. 取消（保留現有藍圖）
+     A. 暫停當前藍圖，開始新的（建議）
+     B. 覆蓋當前藍圖（遺失目前進度）
+     C. 取消（保留現有藍圖）
 
      請選擇：
      ```
-   - 如果狀態是 "Completed"，提示歸檔（見步驟 4.1）
+   - 如果選擇 A，執行暫停流程（見步驟 4.1）
+   - 如果選擇 B，直接覆蓋
+   - 如果選擇 C，中止建立
 
-   **4.1 自動歸檔已完成的藍圖**
+   **4.1 暫停當前藍圖**
 
-   - 從藍圖中讀取功能名稱和建立時間
+   - 從藍圖中讀取功能名稱、建立時間、類型
    - 生成 slug（從功能名稱轉換）：
-     - 轉小寫
+     - 轉小寫（中文保留、英文轉小寫）
      - 空格和特殊字元改為 `-`
      - 移除連續的 `-`
-     - 例如："使用者認證系統" → "使用者認證系統" → "user-auth-system"
-   - 生成檔名：`{建立時間}-feat-{slug}.md`
-   - 移動檔案：`.blueprint/current-feat.md` → `.blueprint/archive/{檔名}`
+     - 例如："使用者認證系統" → "使用者認證系統"
+   - 當前日期作為暫停日期
+   - 生成檔名：`{暫停日期}-{類型}-{slug}.md`
+   - 在藍圖中加上暫停時間：
+     ```markdown
+     **暫停時間**: 2025-12-24
+     ```
+   - 移動檔案：`.blueprint/current.md` → `.blueprint/suspended/{檔名}`
+   - 確保 `.blueprint/suspended/` 目錄存在
+   - 回報：「已暫停舊藍圖：.blueprint/suspended/{檔名}」
+
+   - 如果狀態是 "Completed"，提示歸檔（見步驟 4.2）
+
+   **4.2 自動歸檔已完成的藍圖**
+
+   - 從藍圖中讀取功能名稱、建立時間、類型
+   - 生成 slug（同上）
+   - 生成檔名：`{建立時間}-{類型}-{slug}.md`
+   - 移動檔案：`.blueprint/current.md` → `.blueprint/archive/{檔名}`
    - 確保 `.blueprint/archive/` 目錄存在
    - 回報：「已歸檔舊藍圖：.blueprint/archive/{檔名}」
 
 5. **儲存藍圖**
 
-   建立或更新 `.blueprint/current-feat.md`：
+   建立或更新 `.blueprint/current.md`：
 
    ```markdown
    # Blueprint: [功能名稱]
@@ -151,14 +156,39 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
    - 執行 `/blueprint-ready` 查看狀態並開始實作
    ```
 
-6. **輸出摘要**
+6. **詢問關聯資訊（可選）**
+
+   建立藍圖後，詢問是否要記錄關聯資訊：
+   ```
+   要記錄關聯資訊嗎？（可選，方便日後追蹤）
+
+   可記錄：
+   - Git Branch
+   - Beads Issues
+
+   選項：
+   A. 現在記錄
+   B. 稍後再說
+   ```
+
+   如果選擇 A：
+   - 問：「Git branch 名稱是？（可選，直接按 Enter 跳過）」
+   - 問：「相關的 beads issue IDs？（可選，用逗號分隔，例如：beads-123, beads-124）」
+   - 使用 Edit 工具更新藍圖的「關聯資訊」區塊
+
+7. **輸出摘要**
 
    ```
-   ✓ 藍圖已建立：.blueprint/current-feat.md
+   ✓ 藍圖已建立：.blueprint/current.md
 
    類型：功能開發 (feat)
    功能：[功能名稱]
    階段數：[N] 個
+
+   [如果有關聯資訊]
+   關聯資訊：
+   - Git Branch: feature/xxx
+   - Beads Issues: beads-123
 
    階段規劃：
    1. [階段1名稱] - Pending

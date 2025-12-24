@@ -4,6 +4,10 @@
 **類型**: feat
 **狀態**: Draft
 
+**關聯資訊**:
+- Git Branch:
+- Beads Issues:
+
 ## 功能描述
 
 [從使用者輸入取得的原始描述]
