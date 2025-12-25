@@ -8,6 +8,7 @@
 2. [Slug 生成規則](#slug-生成規則)
 3. [Bash 錯誤處理](#bash-錯誤處理)
 4. [Beads 錯誤處理](#beads-錯誤處理)
+5. [歸檔資料夾結構](#歸檔資料夾結構)
 
 ---
 
@@ -157,3 +158,113 @@ fi
 7. 不中斷核心流程
 
 **詳細說明**：見 `guides/BEADS_INTEGRATION.md`
+
+---
+
+## 歸檔資料夾結構
+
+統一的歸檔格式，適用於 archive/suspended/abandoned 三種狀態，支援打包 reports/ 和 plans/ 文件。
+
+### 資料夾結構
+
+```
+.blueprint/archive/{日期}-{類型}-{slug}/
+├── blueprint.md          # 藍圖檔案（固定名稱）
+├── reports/              # 分析報告（如果存在）
+│   ├── stage-2a-*.md
+│   └── stage-2b-*.md
+└── plans/                # 規劃文件（如果存在）
+    └── common-patterns-plan.md
+```
+
+**適用範圍**：
+- `.blueprint/archive/` - 已完成的藍圖
+- `.blueprint/suspended/` - 暫停的藍圖
+- `.blueprint/abandoned/` - 廢棄的藍圖
+
+### 標準操作流程
+
+```bash
+# 在鎖定下執行（見鎖定機制）
+(
+  flock -w 5 9 || { echo "❌ 無法獲得鎖定"; exit 1; }
+
+  # 1. 建立目標資料夾
+  target_dir=".blueprint/archive/2025-12-25-refactor-優化藍圖系統"
+  mkdir -p "$target_dir" || { echo "❌ 建立資料夾失敗"; exit 1; }
+
+  # 2. 移動藍圖檔案（不改名）
+  mv .blueprint/blueprint.md "$target_dir/" || { echo "❌ 移動藍圖失敗"; exit 1; }
+
+  # 3. 移動 reports/（如果存在且非空）
+  if [ -d .blueprint/reports ] && [ "$(ls -A .blueprint/reports 2>/dev/null)" ]; then
+    mv .blueprint/reports "$target_dir/" || echo "⚠️ 移動 reports 失敗"
+  fi
+
+  # 4. 移動 plans/（如果存在且非空）
+  if [ -d .blueprint/plans ] && [ "$(ls -A .blueprint/plans 2>/dev/null)" ]; then
+    mv .blueprint/plans "$target_dir/" || echo "⚠️ 移動 plans 失敗"
+  fi
+
+) 9>.blueprint/.lock
+```
+
+### 檔名生成規則
+
+- **archive**（歸檔）：`{建立日期}-{類型}-{slug}`
+- **suspended**（暫停）：`{暫停日期}-{類型}-{slug}`
+- **abandoned**（廢棄）：`{廢棄日期}-{類型}-{slug}`
+
+Slug 生成見 [Slug 生成規則](#slug-生成規則)
+
+### 向後相容
+
+- 新藍圖：使用資料夾結構
+- 舊藍圖：保持單檔格式（不遷移）
+- 恢復時：自動偵測格式（資料夾 vs 單檔）
+
+### 恢復操作
+
+```bash
+# 在鎖定下執行
+(
+  flock -w 5 9 || { echo "❌ 無法獲得鎖定"; exit 1; }
+
+  source_path=".blueprint/suspended/2025-12-25-refactor-優化藍圖系統"
+
+  # 偵測格式
+  if [ -d "$source_path" ]; then
+    # 資料夾格式：移動 blueprint.md + reports/ + plans/（不改名）
+    mv "$source_path/blueprint.md" .blueprint/ || { echo "❌ 恢復失敗"; exit 1; }
+
+    # 移動 reports/（如果存在）
+    if [ -d "$source_path/reports" ]; then
+      mv "$source_path/reports" .blueprint/ || echo "⚠️ 移動 reports 失敗"
+    fi
+
+    # 移動 plans/（如果存在）
+    if [ -d "$source_path/plans" ]; then
+      mv "$source_path/plans" .blueprint/ || echo "⚠️ 移動 plans 失敗"
+    fi
+
+    # 刪除空資料夾
+    rmdir "$source_path" 2>/dev/null || true
+  else
+    # 單檔格式（舊格式：current.md）
+    mv "$source_path.md" .blueprint/blueprint.md || { echo "❌ 恢復失敗"; exit 1; }
+  fi
+
+) 9>.blueprint/.lock
+```
+
+### 關鍵要點
+
+1. **統一命名**：當前藍圖和歸檔藍圖都使用 `blueprint.md`
+2. **統一格式**：archive/suspended/abandoned 使用相同結構
+3. **簡化操作**：移動時不用改名，直接移動整個結構
+4. **自動打包**：歸檔時自動移動 reports/ 和 plans/（如果存在）
+5. **非空檢查**：只移動非空的 reports/ 和 plans/
+6. **向後相容**：自動偵測並支援舊格式（current.md 單檔）
+7. **完整恢復**：恢復時移動 blueprint.md + reports/ + plans/ 回來
+8. **錯誤處理**：reports/plans 移動失敗不中斷流程
+9. **清理空資料夾**：恢復後自動刪除空的來源資料夾

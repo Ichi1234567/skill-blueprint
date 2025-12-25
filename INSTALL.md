@@ -59,7 +59,7 @@ blueprint-skill/                      ← 這個 repo
 
 使用時產生：
 your-project/.blueprint/
-├── current.md                        ← 目前的藍圖
+├── blueprint.md                      ← 目前的藍圖
 └── archive/                          ← 歸檔
 ```
 

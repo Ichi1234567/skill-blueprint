@@ -114,7 +114,7 @@ fi
 處理多個 beads IDs（逗號分隔）時，逐一驗證和操作。
 
 ```bash
-beads_ids=$(grep "Beads Issues:" .blueprint/current.md | sed 's/.*: //')
+beads_ids=$(grep "Beads Issues:" .blueprint/blueprint.md | sed 's/.*: //')
 
 if [ -n "$beads_ids" ] && command -v bd &> /dev/null; then
     IFS=',' read -ra IDS <<< "$beads_ids"
@@ -145,7 +145,7 @@ beads 相關資訊儲存在藍圖的「關聯資訊」區塊：
 
 ```bash
 # 讀取所有 beads IDs
-beads_ids=$(grep "Beads Issues:" .blueprint/current.md | sed 's/.*: //')
+beads_ids=$(grep "Beads Issues:" .blueprint/blueprint.md | sed 's/.*: //')
 
 # 讀取第一個 ID
 first_id=$(echo "$beads_ids" | cut -d',' -f1 | tr -d ' ')

@@ -59,7 +59,7 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
 
 4. **檢查現有藍圖**
 
-   - 檢查 `.blueprint/current.md` 是否存在
+   - 檢查 `.blueprint/blueprint.md` 是否存在
    - 如果存在且狀態不是 "Completed"：
      ```
      ⚠️ 已有進行中的藍圖
@@ -81,23 +81,27 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
    **4.1 暫停當前藍圖**
 
    - 讀取藍圖資訊（功能名稱、建立時間、類型）
-   - 生成檔名：`{暫停日期}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
    - 在藍圖中加上暫停時間：`**暫停時間**: 2025-12-24`
-   - 在鎖定下移動檔案到 `.blueprint/suspended/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
-   - 回報：「已暫停舊藍圖：.blueprint/suspended/{檔名}」
+   - 使用資料夾結構暫停（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）：
+     - 生成資料夾名：`{暫停日期}-{類型}-{slug}`
+     - 移動藍圖為 `blueprint.md`
+     - 打包 reports/ 和 plans/（如果存在）
+   - 回報：「已暫停舊藍圖：.blueprint/suspended/{資料夾名}/」
 
    - 如果狀態是 "Completed"，提示歸檔（見步驟 4.2）
 
    **4.2 自動歸檔已完成的藍圖**
 
    - 讀取藍圖資訊（功能名稱、建立時間、類型）
-   - 生成檔名：`{建立時間}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
-   - 在鎖定下移動檔案到 `.blueprint/archive/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
-   - 回報：「已歸檔舊藍圖：.blueprint/archive/{檔名}」
+   - 使用資料夾結構歸檔（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）：
+     - 生成資料夾名：`{建立時間}-{類型}-{slug}`
+     - 移動藍圖為 `blueprint.md`
+     - 打包 reports/ 和 plans/（如果存在）
+   - 回報：「已歸檔舊藍圖：.blueprint/archive/{資料夾名}/」
 
 5. **儲存藍圖**
 
-   建立或更新 `.blueprint/current.md`：
+   建立或更新 `.blueprint/blueprint.md`：
 
    ```markdown
    # Blueprint: [功能名稱]
@@ -172,7 +176,7 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
 7. **輸出摘要**
 
    ```
-   ✓ 藍圖已建立：.blueprint/current.md
+   ✓ 藍圖已建立：.blueprint/blueprint.md
 
    類型：功能開發 (feat)
    功能：[功能名稱]

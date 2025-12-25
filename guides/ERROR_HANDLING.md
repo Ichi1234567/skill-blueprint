@@ -92,7 +92,7 @@ echo "失敗了"
 mkdir -p .blueprint/archive || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
 
 # 移動檔案
-mv .blueprint/current.md .blueprint/archive/2025-12-25-feat-example.md || {
+mv .blueprint/blueprint.md .blueprint/archive/2025-12-25-feat-example/ || {
     echo "❌ 歸檔失敗：無法移動檔案"
     exit 1
 }

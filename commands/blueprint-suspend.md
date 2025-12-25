@@ -20,7 +20,7 @@ description: 暫停當前進行中的藍圖，移到 suspended 目錄。當需�
 
 1. **檢查當前藍圖**
 
-   - 檢查 `.blueprint/current.md` 是否存在
+   - 檢查 `.blueprint/blueprint.md` 是否存在
    - 如果不存在：
      ```
      ❌ 沒有進行中的藍圖可以暫停
@@ -92,15 +92,17 @@ description: 暫停當前進行中的藍圖，移到 suspended 目錄。當需�
      **暫停原因**:
      ```
 
-7. **生成暫停檔名並執行**
+7. **使用資料夾結構暫停**
 
-   - 生成檔名：`{暫停日期}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
-   - 在鎖定下移動檔案到 `.blueprint/suspended/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
+   - 使用資料夾結構（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）：
+     - 生成資料夾名：`{暫停日期}-{類型}-{slug}`
+     - 移動藍圖為 `blueprint.md`
+     - 打包 reports/ 和 plans/（如果存在）
    - 回報：
      ```
      ✓ 藍圖已暫停
 
-     檔案：.blueprint/suspended/{檔名}
+     資料夾：.blueprint/suspended/{資料夾名}/
      類型：{類型}
      功能：{功能名稱}
      暫停原因：{原因}（如果有）

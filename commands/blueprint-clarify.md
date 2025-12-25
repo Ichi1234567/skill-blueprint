@@ -17,7 +17,7 @@ description: 檢查藍圖是否有過於複雜的階段需要標記，確認邊�
 
 1. **載入藍圖**
 
-   - 讀取 `.blueprint/current.md`
+   - 讀取 `.blueprint/blueprint.md`
    - 如果不存在：
      ```
      ❌ 找不到藍圖檔案
@@ -161,7 +161,7 @@ description: 檢查藍圖是否有過於複雜的階段需要標記，確認邊�
 
    下一步：
    - /blueprint-ready - 查看狀態並開始實作
-   - 手動調整 .blueprint/current.md（如需要）
+   - 手動調整 .blueprint/blueprint.md（如需要）
    ```
 
 ## 注意事項

@@ -31,7 +31,7 @@
 /blueprint-feat "實作使用者登入功能"
 ```
 
-產生 `.blueprint/current.md`：
+產生 `.blueprint/blueprint.md`：
 
 ```markdown
 # Blueprint: 使用者登入功能
@@ -91,7 +91,7 @@
 
 ### 5. 更新狀態
 
-手動改 `.blueprint/current.md`：
+手動改 `.blueprint/blueprint.md`：
 
 ```markdown
 - **狀態**: Pending  →  Done

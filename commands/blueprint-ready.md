@@ -11,7 +11,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 
 1. **載入藍圖**
 
-   - 檢查 `.blueprint/current.md` 是否存在
+   - 檢查 `.blueprint/blueprint.md` 是否存在
    - 如果不存在，檢查是否有暫停的藍圖：
      - 使用 Bash 列出 `suspended/` 目錄：`ls -1 .blueprint/suspended/ 2>/dev/null`
      - 如果有暫停的藍圖：
@@ -39,7 +39,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
        範例：
        /blueprint-feat "實作使用者登入功能"
        ```
-   - 讀取 `current.md`
+   - 讀取 `blueprint.md`
    - 從藍圖中讀取類型（從「類型」欄位）
 
 2. **解析階段狀態**
@@ -125,7 +125,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
    繼續完成此階段，完成後請記得更新狀態！
 
    👉 完成時請執行：
-   1. 編輯 .blueprint/current.md
+   1. 編輯 .blueprint/blueprint.md
    2. 將階段 [N] 的「狀態: In Progress」改為「狀態: Done」
    3. 在「檢查記錄」區段加上記錄：
       ### [YYYY-MM-DD]
@@ -267,11 +267,8 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 2. 詢問廢棄原因（會記錄在藍圖中）
 3. 讀取藍圖資訊（功能名稱、建立時間、類型）
 4. 更新藍圖狀態為 "Abandoned"，加上廢棄時間和原因
-5. 生成檔名：`{廢棄日期}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
-6. 移動到 `.blueprint/abandoned/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
-7. 回報結果
-
-**檔案操作須在鎖定下執行**（見 `guides/COMMON_PATTERNS.md#鎖定機制`）
+5. 使用資料夾結構廢棄（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
+6. 回報結果
 
 ## AI 主動協助歸檔藍圖
 
@@ -281,11 +278,8 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 
 1. 讀取藍圖資訊（功能名稱、建立時間、類型）
 2. 檢查並更新狀態為 "Completed"（如尚未完成）
-3. 生成檔名：`{建立日期}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
-4. 移動到 `.blueprint/archive/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
-5. 回報結果
-
-**檔案操作須在鎖定下執行**（見 `guides/COMMON_PATTERNS.md#鎖定機制`）
+3. 使用資料夾結構歸檔（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
+4. 回報結果
 
 ## AI 主動記錄 Beads ID
 
@@ -324,7 +318,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 - "開始實作階段 N"
 
 **AI 行動**：
-1. 詢問確認：「要我幫你更新 `.blueprint/current.md`，將階段 N 的狀態改為 In Progress 嗎？」
+1. 詢問確認：「要我幫你更新 `.blueprint/blueprint.md`，將階段 N 的狀態改為 In Progress 嗎？」
 2. 得到確認後：
    - 使用 Edit 工具更新階段狀態：`Pending` → `In Progress`
    - **不記錄到檢查記錄**（只更新狀態欄位）
@@ -385,7 +379,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 
 ## 如何更新階段狀態
 
-手動編輯 `.blueprint/current.md`：
+手動編輯 `.blueprint/blueprint.md`：
 
 **步驟 1：更新階段狀態**
 ```markdown

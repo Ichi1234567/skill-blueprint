@@ -1,6 +1,6 @@
 ---
 name: blueprint-resume
-description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當想繼續之前暫停的藍圖時使用。
+description: 恢復暫停的藍圖，從 suspended 目錄移回 blueprint.md。當想繼續之前暫停的藍圖時使用。
 ---
 
 # Blueprint Resume - 恢復藍圖
@@ -10,9 +10,9 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 ## 核心功能
 
 - 列出所有暫停的藍圖
-- 恢復選定的藍圖為 current.md
+- 恢復選定的藍圖為 blueprint.md
 - 顯示關聯資訊（提醒要切到哪個 branch）
-- 處理已有 current.md 的情況
+- 處理已有 blueprint.md 的情況
 
 ## 執行步驟
 
@@ -20,7 +20,7 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 
 1. **檢查當前藍圖**
 
-   - 檢查 `.blueprint/current.md` 是否存在
+   - 檢查 `.blueprint/blueprint.md` 是否存在
    - 如果存在：
      ```
      ⚠️ 已有進行中的藍圖：[功能名稱] ([類型])
@@ -43,8 +43,9 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 
      suspended 目錄是空的。
      ```
-   - 對每個檔案：
-     - 使用 Read 工具讀取藍圖內容
+   - 對每個項目（資料夾或檔案）：
+     - 如果是資料夾：讀取 `{資料夾}/blueprint.md`
+     - 如果是 .md 檔案：直接讀取（舊格式）
      - 提取：功能名稱、類型、暫停時間、暫停原因、關聯資訊
    - 顯示清單
 
@@ -108,7 +109,11 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 
 7. **執行恢復**
 
-   - 在鎖定下移動檔案：`.blueprint/suspended/{檔名}` → `.blueprint/current.md`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
+   - 使用資料夾結構恢復（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）：
+     - 偵測格式（資料夾 vs 單檔）
+     - 資料夾格式：移動 `blueprint.md` + `reports/` + `plans/` 回到 `.blueprint/`
+     - 單檔格式（舊）：移動 `.md` 到 `blueprint.md`
+     - 清理空資料夾
    - 回報：
      ```
      ✓ 藍圖已恢復
@@ -157,4 +162,4 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 - 所有其他資訊保持不變（階段進度、關聯資訊等）
 - 如果有 git branch，恢復後會提醒使用者切換
 - 可以用編號或名稱（模糊比對）選擇要恢復的藍圖
-- 如果已有 current.md，會先詢問是否暫停當前藍圖
+- 如果已有 blueprint.md，會先詢問是否暫停當前藍圖
