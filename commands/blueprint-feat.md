@@ -15,24 +15,7 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
 
 ## 執行步驟
 
-**重要：所有涉及檔案操作的 Bash 指令都必須在鎖定機制下執行**
-
-在執行任何 Bash 指令前，使用以下格式獲得鎖定：
-
-```bash
-# 確保 .blueprint 目錄存在
-mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
-
-# 在鎖定下執行操作
-(
-  flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
-
-  # 實際的藍圖操作...
-
-) 9>.blueprint/.lock
-```
-
----
+**重要**：所有檔案操作必須在鎖定下執行（見 `guides/COMMON_PATTERNS.md#鎖定機制`）
 
 1. **解析需求**
    - 從使用者輸入取得功能描述
@@ -97,58 +80,19 @@ mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; 
 
    **4.1 暫停當前藍圖**
 
-   - 從藍圖中讀取功能名稱、建立時間、類型
-   - 生成 slug（從功能名稱轉換，**含安全檢查**）：
-     - **安全性**：移除路徑分隔符（`/`、`\`）和路徑遍歷（`..`）
-     - 轉小寫（中文保留、英文轉小寫）
-     - 空格和特殊字元改為 `-`
-     - 移除連續的 `-`
-     - 移除開頭和結尾的 `-`
-     - **限制長度為 30 字元**（保持檔名簡潔可辨識）
-     - 例如："使用者認證系統" → "使用者認證系統"
-   - 當前日期作為暫停日期
-   - 生成檔名：`{暫停日期}-{類型}-{slug}.md`
-   - 在藍圖中加上暫停時間：
-     ```markdown
-     **暫停時間**: 2025-12-24
-     ```
-   - 使用 Bash 在鎖定下執行暫停操作：
-     ```bash
-     # 確保目錄存在
-     mkdir -p .blueprint/suspended .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
-
-     # 在鎖定下移動檔案
-     (
-       flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
-
-       # 移動檔案
-       mv .blueprint/current.md .blueprint/suspended/{檔名} || { echo "❌ 暫停失敗：無法移動檔案"; exit 1; }
-
-     ) 9>.blueprint/.lock
-     ```
+   - 讀取藍圖資訊（功能名稱、建立時間、類型）
+   - 生成檔名：`{暫停日期}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
+   - 在藍圖中加上暫停時間：`**暫停時間**: 2025-12-24`
+   - 在鎖定下移動檔案到 `.blueprint/suspended/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
    - 回報：「已暫停舊藍圖：.blueprint/suspended/{檔名}」
 
    - 如果狀態是 "Completed"，提示歸檔（見步驟 4.2）
 
    **4.2 自動歸檔已完成的藍圖**
 
-   - 從藍圖中讀取功能名稱、建立時間、類型
-   - 生成 slug（同上，含安全檢查）
-   - 生成檔名：`{建立時間}-{類型}-{slug}.md`
-   - 使用 Bash 在鎖定下執行歸檔操作：
-     ```bash
-     # 確保目錄存在
-     mkdir -p .blueprint/archive .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
-
-     # 在鎖定下移動檔案
-     (
-       flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
-
-       # 移動檔案到歸檔目錄
-       mv .blueprint/current.md .blueprint/archive/{檔名} || { echo "❌ 歸檔失敗：無法移動檔案"; exit 1; }
-
-     ) 9>.blueprint/.lock
-     ```
+   - 讀取藍圖資訊（功能名稱、建立時間、類型）
+   - 生成檔名：`{建立時間}-{類型}-{slug}.md`（slug 規則見 `guides/COMMON_PATTERNS.md#slug生成`）
+   - 在鎖定下移動檔案到 `.blueprint/archive/`（錯誤處理見 `guides/COMMON_PATTERNS.md#bash錯誤處理`）
    - 回報：「已歸檔舊藍圖：.blueprint/archive/{檔名}」
 
 5. **儲存藍圖**
