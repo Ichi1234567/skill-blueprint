@@ -53,14 +53,42 @@ fi
 - beads issue 建立、更新、關閉
 - 其他可選的外部工具整合
 
+**Beads ID 格式驗證**：
+
+使用 beads ID 前，必須驗證格式是否正確（`beads-<數字>`）：
+
+```bash
+# 驗證 beads ID 格式
+if [ -n "$beads_id" ]; then
+    # 檢查格式
+    if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
+        echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
+    elif command -v bd &> /dev/null; then
+        # 格式正確且 bd 存在，執行操作
+        bd close $beads_id || echo "⚠️ beads 關閉失敗：請稍後手動執行 bd close $beads_id"
+    else
+        echo "⚠️ beads 未安裝，請手動關閉 issue: $beads_id"
+    fi
+fi
+```
+
+**格式規則**：
+- 必須以 `beads-` 開頭
+- 後面接數字（1 或多個）
+- ✅ 正確：`beads-123`、`beads-1`、`beads-9999`
+- ❌ 錯誤：`beads123`、`beads-`、`beads-abc`、`issue-123`
+
 ### 3. 條件性操作
 
-**針對特定條件執行**：
+**針對特定條件執行**（含格式驗證）：
 
 ```bash
 # 如果有 beads ID 才執行
 if [ -n "$beads_id" ]; then
-    if command -v bd &> /dev/null; then
+    # 驗證格式
+    if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
+        echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
+    elif command -v bd &> /dev/null; then
         bd close $beads_id || echo "⚠️ beads 關閉失敗：請稍後手動執行 bd close $beads_id"
     else
         echo "⚠️ beads 未安裝，請手動關閉 issue: $beads_id"
@@ -156,11 +184,17 @@ mv .blueprint/current.md .blueprint/suspended/2025-12-25-feat-example.md || {
     exit 1
 }
 
-# 步驟 3：可選的 beads 同步
-if command -v bd &> /dev/null; then
-    bd update beads-123 --status=suspended || {
-        echo "⚠️ beads 更新失敗：請手動執行 bd update beads-123 --status=suspended"
-    }
+# 步驟 3：可選的 beads 同步（含格式驗證）
+beads_id="beads-123"  # 從藍圖讀取
+if [ -n "$beads_id" ]; then
+    # 驗證格式
+    if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
+        echo "⚠️ beads ID 格式錯誤：$beads_id"
+    elif command -v bd &> /dev/null; then
+        bd update $beads_id --status=suspended || {
+            echo "⚠️ beads 更新失敗：請手動執行 bd update $beads_id --status=suspended"
+        }
+    fi
 fi
 
 echo "✓ 藍圖已暫停"

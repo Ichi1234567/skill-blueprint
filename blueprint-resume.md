@@ -16,6 +16,25 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 
 ## 執行步驟
 
+**重要：所有涉及檔案操作的 Bash 指令都必須在鎖定機制下執行**
+
+在執行任何 Bash 指令前，使用以下格式獲得鎖定：
+
+```bash
+# 確保 .blueprint 目錄存在
+mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+
+# 在鎖定下執行操作
+(
+  flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
+
+  # 實際的藍圖操作...
+
+) 9>.blueprint/.lock
+```
+
+---
+
 1. **檢查當前藍圖**
 
    - 檢查 `.blueprint/current.md` 是否存在
@@ -107,9 +126,19 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 7. **執行恢復**
 
    - 確定要恢復的檔案路徑：`.blueprint/suspended/{檔名}`
-   - 移動檔案（含錯誤處理）：
+   - 使用 Bash 在鎖定下執行恢復操作：
      ```bash
-     mv .blueprint/suspended/{檔名} .blueprint/current.md || { echo "❌ 恢復失敗：無法移動檔案"; exit 1; }
+     # 確保目錄存在
+     mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+
+     # 在鎖定下移動檔案
+     (
+       flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
+
+       # 移動檔案從暫停目錄到當前
+       mv .blueprint/suspended/{檔名} .blueprint/current.md || { echo "❌ 恢復失敗：無法移動檔案"; exit 1; }
+
+     ) 9>.blueprint/.lock
      ```
    - 回報：
      ```

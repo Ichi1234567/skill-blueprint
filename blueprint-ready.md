@@ -503,11 +503,14 @@ Created: beads-123
    - 如果有 beads issues，**自動關閉**（不詢問）
 
 3. **執行同步**：
-   - 關閉 beads issue（含錯誤處理）：
+   - 關閉 beads issue（含錯誤處理和格式驗證）：
      ```bash
      # 如果有 beads ID
      if [ -n "$beads_id" ]; then
-         if command -v bd &> /dev/null; then
+         # 驗證 ID 格式
+         if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
+             echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
+         elif command -v bd &> /dev/null; then
              bd close $beads_id || echo "⚠️ beads 關閉失敗：請稍後手動執行 bd close $beads_id"
          else
              echo "⚠️ beads 未安裝，請手動關閉 issue: $beads_id"
@@ -527,11 +530,14 @@ Created: beads-123
 當使用者開始新階段，且有相關 beads issue 時：
 
 1. **自動更新 issue 狀態**：
-   - 更新 beads issue（含錯誤處理）：
+   - 更新 beads issue（含錯誤處理和格式驗證）：
      ```bash
      # 如果有 beads ID
      if [ -n "$beads_id" ]; then
-         if command -v bd &> /dev/null; then
+         # 驗證 ID 格式
+         if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
+             echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
+         elif command -v bd &> /dev/null; then
              bd update $beads_id --status=in_progress || echo "⚠️ beads 更新失敗：請稍後手動執行 bd update $beads_id --status=in_progress"
          else
              echo "⚠️ beads 未安裝，請手動更新 issue: $beads_id"
