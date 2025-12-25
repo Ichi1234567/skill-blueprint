@@ -293,8 +293,14 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
      - **限制長度為 30 字元**（保持檔名簡潔可辨識）
 
 6. **執行廢棄**
-   - 確保 `.blueprint/abandoned/` 目錄存在（使用 Bash: `mkdir -p .blueprint/abandoned`）
-   - 使用 Bash 移動檔案：`mv .blueprint/current-{type}.md .blueprint/abandoned/{檔名}`
+   - 確保 `.blueprint/abandoned/` 目錄存在：
+     ```bash
+     mkdir -p .blueprint/abandoned || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+     ```
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/current.md .blueprint/abandoned/{檔名} || { echo "❌ 廢棄失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：
      ```
      ✓ 藍圖已廢棄
@@ -376,8 +382,14 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
        - "API 重構 v2" → "api-重構-v2"
 
 4. **執行歸檔**
-   - 確保 `.blueprint/archive/` 目錄存在（使用 Bash: `mkdir -p .blueprint/archive`）
-   - 使用 Bash 移動檔案：`mv .blueprint/current.md .blueprint/archive/{檔名}`
+   - 確保 `.blueprint/archive/` 目錄存在：
+     ```bash
+     mkdir -p .blueprint/archive || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+     ```
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/current.md .blueprint/archive/{檔名} || { echo "❌ 歸檔失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：
      ```
      ✓ 藍圖已歸檔
@@ -418,7 +430,16 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 ### 執行步驟
 
 1. **建立 beads issue**（如果使用者請求協助）
-   - 使用 Bash 執行 `bd create` 指令
+   - 執行 bd create（含錯誤處理）：
+     ```bash
+     # 檢查 bd 是否存在
+     if ! command -v bd &> /dev/null; then
+         echo "⚠️ beads 未安裝，跳過 issue 建立"
+         echo "   可稍後手動執行：bd create --title='...' --type=task"
+     else
+         bd create --title="..." --type=task --priority=2 || echo "⚠️ beads 同步失敗：請稍後手動執行"
+     fi
+     ```
    - 從輸出中擷取 beads ID（例如：beads-123）
 
 2. **讀取當前藍圖**
@@ -482,7 +503,17 @@ Created: beads-123
    - 如果有 beads issues，**自動關閉**（不詢問）
 
 3. **執行同步**：
-   - 使用 Bash 執行 `bd close beads-123`（如果有）
+   - 關閉 beads issue（含錯誤處理）：
+     ```bash
+     # 如果有 beads ID
+     if [ -n "$beads_id" ]; then
+         if command -v bd &> /dev/null; then
+             bd close $beads_id || echo "⚠️ beads 關閉失敗：請稍後手動執行 bd close $beads_id"
+         else
+             echo "⚠️ beads 未安裝，請手動關閉 issue: $beads_id"
+         fi
+     fi
+     ```
    - 更新藍圖階段狀態為 Done
    - 在「檢查記錄」加上記錄
    - 回報：
@@ -496,7 +527,17 @@ Created: beads-123
 當使用者開始新階段，且有相關 beads issue 時：
 
 1. **自動更新 issue 狀態**：
-   - 使用 Bash 執行 `bd update beads-123 --status=in_progress`（如果有）
+   - 更新 beads issue（含錯誤處理）：
+     ```bash
+     # 如果有 beads ID
+     if [ -n "$beads_id" ]; then
+         if command -v bd &> /dev/null; then
+             bd update $beads_id --status=in_progress || echo "⚠️ beads 更新失敗：請稍後手動執行 bd update $beads_id --status=in_progress"
+         else
+             echo "⚠️ beads 未安裝，請手動更新 issue: $beads_id"
+         fi
+     fi
+     ```
    - 回報：「✓ 已更新 beads-123 為 in_progress」
 
 ### 注意事項

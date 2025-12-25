@@ -93,8 +93,14 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
      ```markdown
      **暫停時間**: 2025-12-24
      ```
-   - 確保 `.blueprint/suspended/` 目錄存在（使用 Bash: `mkdir -p .blueprint/suspended`）
-   - 移動檔案：`mv .blueprint/current.md .blueprint/suspended/{檔名}`
+   - 確保 `.blueprint/suspended/` 目錄存在：
+     ```bash
+     mkdir -p .blueprint/suspended || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+     ```
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/current.md .blueprint/suspended/{檔名} || { echo "❌ 暫停失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：「已暫停舊藍圖：.blueprint/suspended/{檔名}」
 
    - 如果狀態是 "Completed"，提示歸檔（見步驟 4.2）

@@ -107,7 +107,10 @@ description: 恢復暫停的藍圖，從 suspended 目錄移回 current.md。當
 7. **執行恢復**
 
    - 確定要恢復的檔案路徑：`.blueprint/suspended/{檔名}`
-   - 使用 Bash 移動檔案：`mv .blueprint/suspended/{檔名} .blueprint/current.md`
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/suspended/{檔名} .blueprint/current.md || { echo "❌ 恢復失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：
      ```
      ✓ 藍圖已恢復

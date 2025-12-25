@@ -91,8 +91,14 @@ description: 廢棄當前進行中的藍圖，移到 abandoned 目錄。當決�
 
 7. **執行廢棄**
 
-   - 確保 `.blueprint/abandoned/` 目錄存在（使用 Bash: `mkdir -p .blueprint/abandoned`）
-   - 使用 Bash 移動檔案：`mv .blueprint/current.md .blueprint/abandoned/{檔名}`
+   - 確保 `.blueprint/abandoned/` 目錄存在：
+     ```bash
+     mkdir -p .blueprint/abandoned || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+     ```
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/current.md .blueprint/abandoned/{檔名} || { echo "❌ 廢棄失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：
      ```
      ✓ 藍圖已廢棄

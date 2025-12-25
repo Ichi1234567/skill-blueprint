@@ -107,8 +107,14 @@ description: 暫停當前進行中的藍圖，移到 suspended 目錄。當需�
 
 8. **執行暫停**
 
-   - 確保 `.blueprint/suspended/` 目錄存在（使用 Bash: `mkdir -p .blueprint/suspended`）
-   - 使用 Bash 移動檔案：`mv .blueprint/current.md .blueprint/suspended/{檔名}`
+   - 確保 `.blueprint/suspended/` 目錄存在：
+     ```bash
+     mkdir -p .blueprint/suspended || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
+     ```
+   - 移動檔案（含錯誤處理）：
+     ```bash
+     mv .blueprint/current.md .blueprint/suspended/{檔名} || { echo "❌ 暫停失敗：無法移動檔案"; exit 1; }
+     ```
    - 回報：
      ```
      ✓ 藍圖已暫停
