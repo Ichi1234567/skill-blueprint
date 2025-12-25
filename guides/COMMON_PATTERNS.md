@@ -93,9 +93,44 @@ fi
 
 ## Beads 錯誤處理
 
-beads 整合的標準錯誤處理模式，包含 ID 格式驗證和降級處理。
+beads 整合的標準錯誤處理模式，包含狀態檢查、ID 格式驗證和降級處理。
 
-### 標準處理流程
+### Beads 整合狀態檢查
+
+在執行任何 bd 操作前，先檢查藍圖的「Beads 整合」狀態：
+
+- `enabled` - 正常執行 bd 操作
+- `disabled` - 跳過所有 bd 操作（靜默）
+- `not_available` - 跳過 bd 操作（靜默）
+- `未檢測` - 首次使用時需要檢測
+
+**AI 行為準則**：
+1. 讀取藍圖的「Beads 整合」欄位
+2. 如果是 `disabled` 或 `not_available`：完全跳過 bd 相關邏輯，不執行、不提示
+3. 如果是 `enabled`：執行標準處理流程
+4. 如果是 `未檢測`：執行首次檢測流程（見下方）
+
+### 首次檢測流程
+
+當「Beads 整合」狀態為 `未檢測` 且需要使用 bd 時：
+
+1. **檢測 bd 是否可用**：
+   ```bash
+   command -v bd &> /dev/null
+   ```
+
+2. **根據結果處理**：
+   - 如果可用：更新藍圖狀態為 `enabled`，繼續執行
+   - 如果不可用：詢問使用者「是否打算使用 beads？」
+     - 回答「不用」→ 更新為 `disabled`
+     - 回答「稍後安裝」→ 更新為 `not_available`
+
+3. **更新藍圖**：
+   ```markdown
+   **Beads 整合**: enabled  # 或 disabled / not_available
+   ```
+
+### 標準處理流程（enabled 狀態）
 
 ```bash
 # 如果有 beads ID
@@ -113,10 +148,12 @@ fi
 
 ### 關鍵要點
 
-1. 先檢查是否有 beads ID（避免空值）
-2. 驗證 ID 格式（regex: `^beads-[0-9]+$`）
-3. 檢查 bd 工具是否存在
-4. 失敗時提供手動執行指令
-5. 不中斷核心流程
+1. **優先檢查 Beads 整合狀態**（藍圖欄位）
+2. disabled/not_available 狀態：跳過所有 bd 邏輯
+3. 未檢測狀態：執行首次檢測並更新藍圖
+4. enabled 狀態：執行標準流程
+5. 驗證 ID 格式（regex: `^beads-[0-9]+$`）
+6. 失敗時提供手動執行指令
+7. 不中斷核心流程
 
 **詳細說明**：見 `guides/BEADS_INTEGRATION.md`

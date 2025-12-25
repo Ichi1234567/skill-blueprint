@@ -421,6 +421,8 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 
 當建立 beads issue 時，自動將 ID 記錄到藍圖的「關聯資訊」中。
 
+**前置檢查**：見 `guides/COMMON_PATTERNS.md` > Beads 錯誤處理 > Beads 整合狀態檢查
+
 ### 執行時機
 
 - 使用者說「幫我建立階段 N 的任務」
@@ -480,6 +482,8 @@ Created: beads-123
 ## AI 主動同步狀態
 
 當藍圖和 beads 一起使用時，協助同步兩邊的狀態。
+
+**前置檢查**：見 `guides/COMMON_PATTERNS.md` > Beads 錯誤處理 > Beads 整合狀態檢查
 
 ### 同步時機 1：階段完成時
 

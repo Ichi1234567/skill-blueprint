@@ -11,6 +11,44 @@ Beads 是基於 git 的 issue tracking 系統。skill-blueprint 提供**可選�
 
 **核心原則**：beads 整合是可選的，所有核心功能在沒有 beads 的情況下都必須正常運作。
 
+## Beads 整合狀態管理
+
+每個藍圖包含「Beads 整合」欄位，記錄該藍圖是否使用 beads：
+
+```markdown
+**Beads 整合**: enabled / disabled / not_available / 未檢測
+```
+
+### 狀態定義
+
+- `未檢測` - 新建立的藍圖，尚未確認是否使用 beads（預設值）
+- `enabled` - bd 可用且使用者希望整合（正常執行 bd 指令）
+- `disabled` - 使用者不打算使用 beads（跳過所有 bd 操作，靜默）
+- `not_available` - bd 未安裝且使用者不打算安裝（跳過，靜默）
+
+### 首次檢測
+
+當藍圖首次需要使用 bd 時（例如使用者說「建立任務」）：
+1. 檢查 bd 是否可用（`command -v bd`）
+2. 如果可用 → 更新狀態為 `enabled`
+3. 如果不可用 → 詢問使用者是否打算使用 beads
+   - 不用 → `disabled`
+   - 稍後安裝 → `not_available`
+
+### AI 行為準則
+
+詳見 `COMMON_PATTERNS.md` > Beads 錯誤處理 > Beads 整合狀態檢查
+
+**關鍵點**：
+- `disabled` 或 `not_available`：完全跳過 bd 操作，不執行、不提示
+- `未檢測`：執行首次檢測並更新狀態
+- `enabled`：正常執行 bd 操作
+
+**效益**：
+- 避免重複檢測和提示
+- 使用者可明確控制每個藍圖是否使用 beads
+- 降低 token 使用和重複行為
+
 ## Beads ID 格式
 
 ### 標準格式

@@ -3,6 +3,7 @@
 **建立時間**: YYYY-MM-DD
 **類型**: feat
 **狀態**: Draft
+**Beads 整合**: 未檢測
 
 **關聯資訊**:
 - Git Branch:
