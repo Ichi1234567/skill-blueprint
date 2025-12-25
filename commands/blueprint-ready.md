@@ -430,16 +430,7 @@ description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個�
 ### 執行步驟
 
 1. **建立 beads issue**（如果使用者請求協助）
-   - 執行 bd create（含錯誤處理）：
-     ```bash
-     # 檢查 bd 是否存在
-     if ! command -v bd &> /dev/null; then
-         echo "⚠️ beads 未安裝，跳過 issue 建立"
-         echo "   可稍後手動執行：bd create --title='...' --type=task"
-     else
-         bd create --title="..." --type=task --priority=2 || echo "⚠️ beads 同步失敗：請稍後手動執行"
-     fi
-     ```
+   - 執行 bd create（使用標準錯誤處理，見 `guides/COMMON_PATTERNS.md` > Bash 錯誤處理 > 非關鍵操作）
    - 從輸出中擷取 beads ID（例如：beads-123）
 
 2. **讀取當前藍圖**
@@ -503,48 +494,18 @@ Created: beads-123
    - 如果有 beads issues，**自動關閉**（不詢問）
 
 3. **執行同步**：
-   - 關閉 beads issue（含錯誤處理和格式驗證）：
-     ```bash
-     # 如果有 beads ID
-     if [ -n "$beads_id" ]; then
-         # 驗證 ID 格式
-         if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
-             echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
-         elif command -v bd &> /dev/null; then
-             bd close $beads_id || echo "⚠️ beads 關閉失敗：請稍後手動執行 bd close $beads_id"
-         else
-             echo "⚠️ beads 未安裝，請手動關閉 issue: $beads_id"
-         fi
-     fi
-     ```
+   - 關閉 beads issue（使用標準處理流程，見 `guides/COMMON_PATTERNS.md` > Beads 錯誤處理）
    - 更新藍圖階段狀態為 Done
    - 在「檢查記錄」加上記錄
-   - 回報：
-     ```
-     ✓ 已更新階段 N 為 Done
-     ✓ 已關閉 beads-123
-     ```
+   - 回報：`✓ 已更新階段 N 為 Done` 和 `✓ 已關閉 beads-123`（如成功）
 
 ### 同步時機 2：開始階段時
 
 當使用者開始新階段，且有相關 beads issue 時：
 
 1. **自動更新 issue 狀態**：
-   - 更新 beads issue（含錯誤處理和格式驗證）：
-     ```bash
-     # 如果有 beads ID
-     if [ -n "$beads_id" ]; then
-         # 驗證 ID 格式
-         if [[ ! "$beads_id" =~ ^beads-[0-9]+$ ]]; then
-             echo "⚠️ beads ID 格式錯誤：$beads_id（應為 beads-<數字>，例如 beads-123）"
-         elif command -v bd &> /dev/null; then
-             bd update $beads_id --status=in_progress || echo "⚠️ beads 更新失敗：請稍後手動執行 bd update $beads_id --status=in_progress"
-         else
-             echo "⚠️ beads 未安裝，請手動更新 issue: $beads_id"
-         fi
-     fi
-     ```
-   - 回報：「✓ 已更新 beads-123 為 in_progress」
+   - 更新 beads issue（使用標準處理流程，見 `guides/COMMON_PATTERNS.md` > Beads 錯誤處理）
+   - 回報：`✓ 已更新 beads-123 為 in_progress`（如成功）
 
 ### 注意事項
 
