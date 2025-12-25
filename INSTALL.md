@@ -22,7 +22,7 @@ cd /path/to/blueprint-skill
 因為用的是 symbolic link，直接編輯 .md 檔就會生效：
 
 ```bash
-vim blueprint-feat.md
+vim commands/blueprint-feat.md
 # 修改後，在 Claude Code 中測試
 ```
 
@@ -36,15 +36,24 @@ rm ~/.claude/commands/blueprint-*.md
 
 ```
 blueprint-skill/                      ← 這個 repo
-├── blueprint-feat.md                 ← 三個 command 定義
-├── blueprint-clarify.md
-├── blueprint-ready.md
-├── templates/blueprint-template.md   ← 範本
-└── install.sh                        ← 安裝腳本
+├── commands/                          ← 指令檔案
+│   ├── blueprint-feat.md
+│   ├── blueprint-clarify.md
+│   ├── blueprint-ready.md
+│   ├── blueprint-suspend.md
+│   ├── blueprint-resume.md
+│   └── blueprint-abandon.md
+├── guides/                            ← 輔助指南
+│   ├── BEADS_INTEGRATION.md
+│   ├── ERROR_HANDLING.md
+│   └── LOCKING.md
+├── templates/                         ← 範本
+│   └── blueprint-template.md
+└── install.sh                         ← 安裝腳本
 
 安裝後：
 ~/.claude/commands/
-├── blueprint-feat.md -> /path/to/blueprint-skill/blueprint-feat.md
+├── blueprint-feat.md -> /path/to/blueprint-skill/commands/blueprint-feat.md
 ├── blueprint-clarify.md -> ...
 └── blueprint-ready.md -> ...
 
