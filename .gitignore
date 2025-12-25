@@ -1,3 +1,6 @@
 .cloude
 .beads
 .gitattributes
+
+# 藍圖工作目錄（個人使用，不提交）
+.blueprint/

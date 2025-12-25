@@ -79,10 +79,13 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
    **4.1 暫停當前藍圖**
 
    - 從藍圖中讀取功能名稱、建立時間、類型
-   - 生成 slug（從功能名稱轉換）：
+   - 生成 slug（從功能名稱轉換，**含安全檢查**）：
+     - **安全性**：移除路徑分隔符（`/`、`\`）和路徑遍歷（`..`）
      - 轉小寫（中文保留、英文轉小寫）
      - 空格和特殊字元改為 `-`
      - 移除連續的 `-`
+     - 移除開頭和結尾的 `-`
+     - **限制長度為 30 字元**（保持檔名簡潔可辨識）
      - 例如："使用者認證系統" → "使用者認證系統"
    - 當前日期作為暫停日期
    - 生成檔名：`{暫停日期}-{類型}-{slug}.md`
@@ -90,8 +93,8 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
      ```markdown
      **暫停時間**: 2025-12-24
      ```
-   - 移動檔案：`.blueprint/current.md` → `.blueprint/suspended/{檔名}`
-   - 確保 `.blueprint/suspended/` 目錄存在
+   - 確保 `.blueprint/suspended/` 目錄存在（使用 Bash: `mkdir -p .blueprint/suspended`）
+   - 移動檔案：`mv .blueprint/current.md .blueprint/suspended/{檔名}`
    - 回報：「已暫停舊藍圖：.blueprint/suspended/{檔名}」
 
    - 如果狀態是 "Completed"，提示歸檔（見步驟 4.2）
@@ -99,7 +102,7 @@ description: 從自然語言描述建立功能實作藍圖，階段性規劃以�
    **4.2 自動歸檔已完成的藍圖**
 
    - 從藍圖中讀取功能名稱、建立時間、類型
-   - 生成 slug（同上）
+   - 生成 slug（同上，含安全檢查）
    - 生成檔名：`{建立時間}-{類型}-{slug}.md`
    - 移動檔案：`.blueprint/current.md` → `.blueprint/archive/{檔名}`
    - 確保 `.blueprint/archive/` 目錄存在
