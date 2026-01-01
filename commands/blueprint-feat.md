@@ -45,9 +45,42 @@ description: 建立功能藍圖
 
 4. **檢查現有藍圖**
    - 檢查 `.blueprint/blueprint.md` 是否存在
-   - 存在且非 "Completed" → 提供選項：A. 暫停當前 / B. 覆蓋 / C. 取消
-   - 選 A → 執行暫停（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
-   - Completed → 執行歸檔（同上）
+   - 不存在 → 跳到步驟 5
+   - 存在且狀態 "Completed" → 執行歸檔（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
+   - 存在且非 "Completed" → 根據設定處理衝突：
+
+   **衝突處理邏輯**（載入 `lib/settings.sh`）：
+   ```bash
+   source lib/settings.sh
+   ensure_settings_file
+   load_settings
+   conflict_action=$(get_setting "on_blueprint_conflict" "ask")
+   ```
+
+   - `conflict_action=ask`（預設）→ 提供選項：
+     ```
+     偵測到進行中的藍圖：[功能名稱]
+
+     請選擇處理方式：
+     A. 暫停當前藍圖
+     B. 覆蓋當前藍圖
+     C. 取消建立新藍圖
+     ```
+   - `conflict_action=always_suspend` → 自動暫停當前藍圖：
+     ```
+     ⚠️  偵測到進行中的藍圖：[功能名稱]
+     📦 根據設定自動暫停（on_blueprint_conflict=always_suspend）
+     ```
+   - `conflict_action=always_overwrite` → 自動覆蓋：
+     ```
+     ⚠️  偵測到進行中的藍圖：[功能名稱]
+     🔄 根據設定自動覆蓋（on_blueprint_conflict=always_overwrite）
+     ```
+
+   **執行動作**：
+   - 選 A 或 always_suspend → 執行暫停（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
+   - 選 B 或 always_overwrite → 覆蓋藍圖（繼續步驟 5）
+   - 選 C → 取消建立新藍圖
 
 5. **儲存藍圖**
 
