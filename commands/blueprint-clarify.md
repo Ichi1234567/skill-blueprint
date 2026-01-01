@@ -1,6 +1,6 @@
 ---
 name: blueprint-clarify
-description: 檢查藍圖是否有過於複雜的階段需要標記，確認邊界定義是否清楚。當藍圖建立後需要快速驗證時使用（簡化版，不做過多互動）。
+description: 檢查確認邊界，標記難度
 ---
 
 # Blueprint Clarify - 檢查藍圖

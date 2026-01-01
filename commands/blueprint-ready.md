@@ -1,6 +1,6 @@
 ---
 name: blueprint-ready
-description: 檢查藍圖狀態，顯示進度，建議下一步該執行哪個階段。當想知道目前進度、或不確定下一步該做什麼時使用。
+description: 檢查藍圖狀態，建議下一步
 ---
 
 # Blueprint Ready - 檢查狀態

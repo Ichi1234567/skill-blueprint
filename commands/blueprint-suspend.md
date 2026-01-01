@@ -1,6 +1,6 @@
 ---
 name: blueprint-suspend
-description: 暫停當前進行中的藍圖，移到 suspended 目錄。當需要切換到其他藍圖或暫時不想繼續當前藍圖時使用。
+description: 暫停藍圖
 ---
 
 # Blueprint Suspend - 暫停藍圖

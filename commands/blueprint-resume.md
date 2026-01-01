@@ -1,6 +1,6 @@
 ---
 name: blueprint-resume
-description: 恢復暫停的藍圖，從 suspended 目錄移回 blueprint.md。當想繼續之前暫停的藍圖時使用。
+description: 恢復暫停的藍圖
 ---
 
 # Blueprint Resume - 恢復藍圖

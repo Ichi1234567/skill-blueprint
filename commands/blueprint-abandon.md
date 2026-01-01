@@ -1,6 +1,6 @@
 ---
 name: blueprint-abandon
-description: 廢棄當前進行中的藍圖，移到 abandoned 目錄。當決定不再繼續某個藍圖時使用。
+description: 廢棄進行中的藍圖
 ---
 
 # Blueprint Abandon - 廢棄藍圖

@@ -1,6 +1,6 @@
 ---
 name: blueprint-feat
-description: 從自然語言描述建立功能實作藍圖,階段性規劃以減少 token 使用。當需要規劃新功能、將需求拆解成可管理的階段、或希望界定清楚的執行邊界時使用。
+description: 建立功能藍圖
 ---
 
 # Blueprint Feat - 建立功能藍圖
