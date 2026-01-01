@@ -88,12 +88,31 @@ B. 開始新的藍圖 - 執行 /blueprint-feat "功能描述"
 
 ### 情況 A：所有階段完成
 
+**自動歸檔邏輯**（載入 `lib/settings.sh` 和 `lib/archive.sh`）：
+```bash
+source lib/settings.sh
+source lib/archive.sh
+ensure_settings_file
+load_settings
+auto_archive=$(get_setting "auto_archive_on_complete" "false")
 ```
-🎉 藍圖已全部完成！
 
-接下來要歸檔這個藍圖嗎？回覆「歸檔」我會自動處理。
-格式：{建立日期}-{類型}-{slug}
-```
+- `auto_archive=true` → 自動執行歸檔：
+  ```
+  🎉 藍圖已全部完成！
+
+  📦 根據設定自動歸檔（auto_archive_on_complete=true）
+  [執行歸檔操作...]
+  ✓ 藍圖已歸檔到：.blueprint/archive/{建立日期}-{類型}-{slug}
+  ```
+
+- `auto_archive=false`（預設）→ 詢問使用者：
+  ```
+  🎉 藍圖已全部完成！
+
+  接下來要歸檔這個藍圖嗎？回覆「歸檔」我會自動處理。
+  格式：{建立日期}-{類型}-{slug}
+  ```
 
 ### 情況 B：有進行中的階段
 
@@ -135,11 +154,22 @@ B. 開始新的藍圖 - 執行 /blueprint-feat "功能描述"
 
 **觸發**：使用者說「歸檔」、「廢棄」或類似訊息
 
-**執行**：
+**執行**（使用 `lib/archive.sh`）：
 1. 讀取藍圖資訊（功能名稱、建立時間、類型）
 2. 更新狀態為 "Completed" 或 "Abandoned"
-3. 使用資料夾結構歸檔（見 `guides/COMMON_PATTERNS.md#歸檔資料夾結構`）
-4. 廢棄時詢問原因並記錄
+3. 使用 `archive_blueprint()` 或 `abandon_blueprint()` 執行歸檔
+4. 廢棄時詢問原因並記錄到藍圖檔案
+
+**範例**：
+```bash
+source lib/archive.sh
+
+# 歸檔
+archive_blueprint "藍圖系統設定檔與行為優化" "perf" "2025-12-27"
+
+# 廢棄
+abandon_blueprint "藍圖系統設定檔與行為優化" "perf" "2026-01-01"
+```
 
 ### Beads 整合
 
