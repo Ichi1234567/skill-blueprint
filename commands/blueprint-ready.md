@@ -150,6 +150,27 @@ B. 開始新的藍圖 - 執行 /blueprint-feat "功能描述"
 - 同步狀態：階段完成時關閉 issue、開始時更新為 in_progress
 - 詳細邏輯見 `guides/BEADS_INTEGRATION.md`
 
+### Git Branch 自動管理
+
+**觸發**：藍圖狀態從 Draft → In Progress（開始第一個階段時）
+
+**執行**：
+1. 檢查 git_branch_auto_manage 設定（預設 true）
+2. 如果啟用，載入 lib/git-utils.sh
+3. 呼叫 `auto_manage_git_branch(type, title)`
+4. 自動建立/切換到對應 branch
+
+**命名規則**：
+- 預設：`{type}/{slug}`（範例：feat/oauth-integration）
+- 可在 `.blueprint/settings` 自訂 git_branch_naming
+
+**錯誤處理**：
+- 不在 git repo → 警告並跳過
+- Branch 操作失敗 → 提示手動命令
+- 自動管理停用 → 靜默跳過
+
+**詳細整合邏輯**：見 `.blueprint/plans/git-integration-guide.md`
+
 ### 更新階段狀態
 
 AI 應主動偵測並協助更新狀態：

@@ -39,10 +39,38 @@ mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; 
 
 ## Slug 生成規則
 
-從功能名稱生成安全的檔案名稱 slug，用於暫停、廢棄、歸檔藍圖時的檔名。
+從功能名稱生成安全的檔案名稱 slug。根據使用場景分為兩種類型：
 
-### 轉換規則
+### 兩種 Slug 類型
 
+| 類型 | 用途 | 範例 |
+|------|------|------|
+| **ASCII-only slug** | Git branch、worktree 名稱 | `oauth-integration` |
+| **保留中文 slug** | 歸檔資料夾名稱 | `oauth-整合` |
+
+### ASCII-only Slug（用於 Git）
+
+自動翻譯中文為英文，產生有意義的 ASCII-only slug。
+
+**轉換規則**：
+1. **中文處理**：自動翻譯為英文
+2. **安全性**：移除路徑分隔符（`/`、`\`）和路徑遍歷（`..`）
+3. 轉小寫
+4. 空格和特殊字元改為 `-`
+5. 移除連續的 `-`
+6. 移除開頭和結尾的 `-`
+7. **限制長度為 30 字元**
+
+**範例**：
+- "OAuth 整合" → "oauth-integration"
+- "使用者認證系統" → "user-authentication-system"
+- "API 重構 v2" → "api-refactoring-v2"
+
+### 保留中文 Slug（用於歸檔）
+
+用於歸檔資料夾名稱，保留原始語言。
+
+**轉換規則**：
 1. **安全性**：移除路徑分隔符（`/`、`\`）和路徑遍歷（`..`）
 2. 轉小寫（中文保留、英文轉小寫）
 3. 空格和特殊字元改為 `-`
@@ -50,11 +78,22 @@ mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; 
 5. 移除開頭和結尾的 `-`
 6. **限制長度為 30 字元**
 
-### 範例
-
+**範例**：
 - "OAuth 整合" → "oauth-整合"
 - "User Authentication System" → "user-authentication-system"
 - "API 重構 v2" → "api-重構-v2"
+
+### 函式參考
+
+```bash
+# ASCII-only slug（用於 git branch/worktree）
+generate_ascii_slug "$title"
+
+# 保留中文 slug（用於歸檔資料夾）
+generate_slug "$title"
+```
+
+**詳細實作**：見 `.blueprint/plans/slug-generation-enhanced.md`
 
 ---
 
