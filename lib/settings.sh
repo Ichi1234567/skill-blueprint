@@ -73,7 +73,7 @@ on_blueprint_conflict=ask
 auto_archive_on_complete=false
 EOF
 
-        echo "✓ 已建立設定檔：.blueprint/settings（可手動調整）"
+        echo "✓ 已建立設定檔：.blueprint/settings（可手動調整）" >&2
     fi
 
     echo "$settings_file"
@@ -105,8 +105,8 @@ load_settings() {
         # 跳過空值
         [[ -z "$key" ]] && continue
 
-        # 設定變數（使用 declare -g 確保全域）
-        declare -g "$key=$value"
+        # 設定變數（使用 eval，相容舊版 bash）
+        eval "$key=\"$value\""
     done < "$settings_file" 2>/dev/null || true
 }
 
@@ -125,8 +125,15 @@ get_setting() {
         load_settings
     fi
 
-    # 取得值（使用間接變數引用）
-    local value="${!key:-$default}"
+    # 取得值（使用 eval 進行間接變數引用，相容 bash/zsh）
+    local value
+    if [ -n "$key" ]; then
+        eval "value=\${${key}:-}"
+    fi
+    # 若值為空，使用預設值
+    if [ -z "$value" ]; then
+        value="$default"
+    fi
     echo "$value"
 }
 
