@@ -1,0 +1,15 @@
+# Blueprint Settings - Fast Iteration
+# 快速迭代設定：自動處理衝突，自動歸檔
+
+# Git 整合
+git_branch_naming={type}/{slug}
+git_branch_auto_manage=true
+git_worktree_naming=worktree-{type}-{slug}
+
+# Beads 整合
+beads_integration=disabled
+beads_auto_link=true
+
+# 藍圖行為
+on_blueprint_conflict=always_suspend
+auto_archive_on_complete=true

@@ -1,0 +1,15 @@
+# Blueprint Settings - Team with Beads
+# 團隊開發設定：整合 beads 任務追蹤，詢問歸檔
+
+# Git 整合
+git_branch_naming={type}/{slug}
+git_branch_auto_manage=true
+git_worktree_naming=worktree-{type}-{slug}
+
+# Beads 整合
+beads_integration=enabled
+beads_auto_link=true
+
+# 藍圖行為
+on_blueprint_conflict=ask
+auto_archive_on_complete=false
