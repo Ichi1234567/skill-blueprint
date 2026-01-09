@@ -1,0 +1,15 @@
+# Blueprint Settings - Manual Control
+# 手動控制設定：最小干預，所有操作手動確認
+
+# Git 整合
+git_branch_naming={type}/{slug}
+git_branch_auto_manage=false
+git_worktree_naming=worktree-{type}-{slug}
+
+# Beads 整合
+beads_integration=ask_each_time
+beads_auto_link=false
+
+# 藍圖行為
+on_blueprint_conflict=ask
+auto_archive_on_complete=false

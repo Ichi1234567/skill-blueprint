@@ -1,0 +1,15 @@
+# Blueprint Settings - Solo Developer
+# 個人開發者設定：自動化 git，不使用 beads，自動歸檔
+
+# Git 整合
+git_branch_naming={type}/{slug}
+git_branch_auto_manage=true
+git_worktree_naming=worktree-{type}-{slug}
+
+# Beads 整合
+beads_integration=disabled
+beads_auto_link=true
+
+# 藍圖行為
+on_blueprint_conflict=ask
+auto_archive_on_complete=true
