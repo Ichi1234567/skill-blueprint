@@ -3,9 +3,8 @@
 # Git branch 管理輔助工具，提供判斷函式與名稱生成
 
 # 載入依賴
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/settings.sh"
-source "$SCRIPT_DIR/slug.sh"
+source lib/settings.sh
+source lib/slug.sh
 
 # 檢查是否啟用 git branch 自動管理
 # 參數：無

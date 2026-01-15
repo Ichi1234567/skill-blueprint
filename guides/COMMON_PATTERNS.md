@@ -17,21 +17,23 @@
 
 所有涉及檔案操作的 Bash 指令都必須在鎖定機制下執行，避免多會話競爭條件。
 
-使用專用鎖文件：`.blueprint/.lock`，逾時設定 5 秒。
+使用專用鎖目錄：`.blueprint/.lock/`，逾時設定 5 秒，基於 mkdir atomic + PID tracking。
 
 ### 標準範例
 
 ```bash
+# 載入鎖定函式庫
+source lib/lock.sh
+
 # 確保 .blueprint 目錄存在
 mkdir -p .blueprint || { echo "❌ 建立目錄失敗：請檢查檔案權限"; exit 1; }
 
 # 在鎖定下執行操作
-(
-  flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
+acquire_lock 5 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; exit 1; }
 
-  # 實際的藍圖操作...
+# 實際的藍圖操作...
 
-) 9>.blueprint/.lock
+release_lock
 ```
 
 **詳細說明**：見 `guides/LOCKING.md`
@@ -226,27 +228,27 @@ fi
 
 ```bash
 # 在鎖定下執行（見鎖定機制）
-(
-  flock -w 5 9 || { echo "❌ 無法獲得鎖定"; exit 1; }
+source lib/lock.sh
+acquire_lock 5 || { echo "❌ 無法獲得鎖定"; exit 1; }
 
-  # 1. 建立目標資料夾
-  target_dir=".blueprint/archive/2025-12-25-refactor-優化藍圖系統"
-  mkdir -p "$target_dir" || { echo "❌ 建立資料夾失敗"; exit 1; }
+# 1. 建立目標資料夾
+target_dir=".blueprint/archive/2025-12-25-refactor-優化藍圖系統"
+mkdir -p "$target_dir" || { release_lock; echo "❌ 建立資料夾失敗"; exit 1; }
 
-  # 2. 移動藍圖檔案（不改名）
-  mv .blueprint/blueprint.md "$target_dir/" || { echo "❌ 移動藍圖失敗"; exit 1; }
+# 2. 移動藍圖檔案（不改名）
+mv .blueprint/blueprint.md "$target_dir/" || { release_lock; echo "❌ 移動藍圖失敗"; exit 1; }
 
-  # 3. 移動 reports/（如果存在且非空）
-  if [ -d .blueprint/reports ] && [ "$(ls -A .blueprint/reports 2>/dev/null)" ]; then
-    mv .blueprint/reports "$target_dir/" || echo "⚠️ 移動 reports 失敗"
-  fi
+# 3. 移動 reports/（如果存在且非空）
+if [ -d .blueprint/reports ] && [ "$(ls -A .blueprint/reports 2>/dev/null)" ]; then
+  mv .blueprint/reports "$target_dir/" || echo "⚠️ 移動 reports 失敗"
+fi
 
-  # 4. 移動 plans/（如果存在且非空）
-  if [ -d .blueprint/plans ] && [ "$(ls -A .blueprint/plans 2>/dev/null)" ]; then
-    mv .blueprint/plans "$target_dir/" || echo "⚠️ 移動 plans 失敗"
-  fi
+# 4. 移動 plans/（如果存在且非空）
+if [ -d .blueprint/plans ] && [ "$(ls -A .blueprint/plans 2>/dev/null)" ]; then
+  mv .blueprint/plans "$target_dir/" || echo "⚠️ 移動 plans 失敗"
+fi
 
-) 9>.blueprint/.lock
+release_lock
 ```
 
 ### 檔名生成規則
@@ -267,34 +269,34 @@ Slug 生成見 [Slug 生成規則](#slug-生成規則)
 
 ```bash
 # 在鎖定下執行
-(
-  flock -w 5 9 || { echo "❌ 無法獲得鎖定"; exit 1; }
+source lib/lock.sh
+acquire_lock 5 || { echo "❌ 無法獲得鎖定"; exit 1; }
 
-  source_path=".blueprint/suspended/2025-12-25-refactor-優化藍圖系統"
+source_path=".blueprint/suspended/2025-12-25-refactor-優化藍圖系統"
 
-  # 偵測格式
-  if [ -d "$source_path" ]; then
-    # 資料夾格式：移動 blueprint.md + reports/ + plans/（不改名）
-    mv "$source_path/blueprint.md" .blueprint/ || { echo "❌ 恢復失敗"; exit 1; }
+# 偵測格式
+if [ -d "$source_path" ]; then
+  # 資料夾格式：移動 blueprint.md + reports/ + plans/（不改名）
+  mv "$source_path/blueprint.md" .blueprint/ || { release_lock; echo "❌ 恢復失敗"; exit 1; }
 
-    # 移動 reports/（如果存在）
-    if [ -d "$source_path/reports" ]; then
-      mv "$source_path/reports" .blueprint/ || echo "⚠️ 移動 reports 失敗"
-    fi
-
-    # 移動 plans/（如果存在）
-    if [ -d "$source_path/plans" ]; then
-      mv "$source_path/plans" .blueprint/ || echo "⚠️ 移動 plans 失敗"
-    fi
-
-    # 刪除空資料夾
-    rmdir "$source_path" 2>/dev/null || true
-  else
-    # 單檔格式（舊格式：current.md）
-    mv "$source_path.md" .blueprint/blueprint.md || { echo "❌ 恢復失敗"; exit 1; }
+  # 移動 reports/（如果存在）
+  if [ -d "$source_path/reports" ]; then
+    mv "$source_path/reports" .blueprint/ || echo "⚠️ 移動 reports 失敗"
   fi
 
-) 9>.blueprint/.lock
+  # 移動 plans/（如果存在）
+  if [ -d "$source_path/plans" ]; then
+    mv "$source_path/plans" .blueprint/ || echo "⚠️ 移動 plans 失敗"
+  fi
+
+  # 刪除空資料夾
+  rmdir "$source_path" 2>/dev/null || true
+else
+  # 單檔格式（舊格式：current.md）
+  mv "$source_path.md" .blueprint/blueprint.md || { release_lock; echo "❌ 恢復失敗"; exit 1; }
+fi
+
+release_lock
 ```
 
 ### 關鍵要點

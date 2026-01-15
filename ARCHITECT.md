@@ -62,7 +62,7 @@ skill-blueprint/
 | **abandon** | 廢棄 | 確認 → 記錄原因 → 移到 abandoned/ |
 
 **特點**:
-- 所有操作在 `flock` 鎖定下執行
+- 所有操作在鎖定機制下執行（lib/lock.sh）
 - 衝突支援 ask/always_suspend/always_overwrite
 - 使用 Edit 工具保持 Markdown 可讀性
 
@@ -173,14 +173,15 @@ validate_beads_id(id)         # 驗證格式：^beads-[0-9]+$
 
 ### 檔案鎖定
 ```bash
-(
-  flock -w 5 9 || { echo "❌ 無法獲得鎖定"; exit 1; }
-  # 操作...
-) 9>.blueprint/.lock
+source lib/lock.sh
+acquire_lock 5 || { echo "❌ 無法獲得鎖定"; exit 1; }
+# 操作...
+release_lock
 ```
+- 基於 mkdir atomic + PID tracking
 - 防止多會話競爭
 - 逾時 5 秒自動失敗
-- 程序結束自動釋放
+- 支援 stale lock 檢測與清理
 
 ### Slug 生成規則
 
@@ -210,7 +211,6 @@ validate_beads_id(id)         # 驗證格式：^beads-[0-9]+$
 
 ### 必須
 - Bash 3.2+
-- flock (已內建)
 - grep/sed/awk
 
 ### 可選

@@ -3,8 +3,7 @@
 # Beads issue tracking 整合輔助工具，提供判斷函式與驗證
 
 # 載入依賴
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/settings.sh"
+source lib/settings.sh
 
 # 檢查 bd 指令是否可用
 # 參數：無

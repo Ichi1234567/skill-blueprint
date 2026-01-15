@@ -3,8 +3,8 @@
 # 歸檔/暫停/廢棄藍圖的工具函式
 
 # 載入依賴
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/slug.sh"
+source lib/slug.sh
+source lib/lock.sh
 
 # 移動藍圖到指定目標資料夾
 # 參數：
@@ -19,36 +19,33 @@ move_blueprint_to_folder() {
     fi
 
     # 在鎖定下執行（見 guides/COMMON_PATTERNS.md#鎖定機制）
-    (
-        flock -w 5 9 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; return 1; }
+    acquire_lock 5 || { echo "❌ 無法獲得鎖定：另一個會話正在操作藍圖，請稍後再試"; return 1; }
 
-        # 1. 建立目標資料夾
-        mkdir -p "$target_dir" || { echo "❌ 建立資料夾失敗：$target_dir"; return 1; }
+    # 1. 建立目標資料夾
+    mkdir -p "$target_dir" || { release_lock; echo "❌ 建立資料夾失敗：$target_dir"; return 1; }
 
-        # 2. 移動藍圖檔案（不改名）
-        if [ -f .blueprint/blueprint.md ]; then
-            mv .blueprint/blueprint.md "$target_dir/" || { echo "❌ 移動藍圖失敗"; return 1; }
-        else
-            echo "❌ 藍圖檔案不存在：.blueprint/blueprint.md"
-            return 1
-        fi
+    # 2. 移動藍圖檔案（不改名）
+    if [ -f .blueprint/blueprint.md ]; then
+        mv .blueprint/blueprint.md "$target_dir/" || { release_lock; echo "❌ 移動藍圖失敗"; return 1; }
+    else
+        release_lock
+        echo "❌ 藍圖檔案不存在：.blueprint/blueprint.md"
+        return 1
+    fi
 
-        # 3. 移動 reports/（如果存在且非空）
-        if [ -d .blueprint/reports ] && [ "$(ls -A .blueprint/reports 2>/dev/null)" ]; then
-            mv .blueprint/reports "$target_dir/" || echo "⚠️  移動 reports 失敗（非致命）"
-        fi
+    # 3. 移動 reports/（如果存在且非空）
+    if [ -d .blueprint/reports ] && [ "$(ls -A .blueprint/reports 2>/dev/null)" ]; then
+        mv .blueprint/reports "$target_dir/" || echo "⚠️  移動 reports 失敗（非致命）"
+    fi
 
-        # 4. 移動 plans/（如果存在且非空）
-        if [ -d .blueprint/plans ] && [ "$(ls -A .blueprint/plans 2>/dev/null)" ]; then
-            mv .blueprint/plans "$target_dir/" || echo "⚠️  移動 plans 失敗（非致命）"
-        fi
+    # 4. 移動 plans/（如果存在且非空）
+    if [ -d .blueprint/plans ] && [ "$(ls -A .blueprint/plans 2>/dev/null)" ]; then
+        mv .blueprint/plans "$target_dir/" || echo "⚠️  移動 plans 失敗（非致命）"
+    fi
 
-        echo "✓ 藍圖已移動到：$target_dir"
-        return 0
-
-    ) 9>.blueprint/.lock
-
-    return $?
+    echo "✓ 藍圖已移動到：$target_dir"
+    release_lock
+    return 0
 }
 
 # 歸檔藍圖（用於已完成的藍圖）
