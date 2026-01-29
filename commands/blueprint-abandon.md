@@ -1,6 +1,7 @@
 ---
 name: blueprint-abandon
 description: 廢棄進行中的藍圖
+allowed-tools: Read, Bash(source *), Bash(mkdir *), Bash(mv *), Bash(ls *), Bash(date *)
 ---
 
 # Blueprint Abandon - 廢棄藍圖
