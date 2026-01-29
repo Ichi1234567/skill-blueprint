@@ -68,8 +68,8 @@ generate_ascii_slug() {
     # 步驟 6: 移除開頭和結尾的 -
     processed_title=$(echo "$processed_title" | sed 's/^-//;s/-$//')
 
-    # 步驟 7: 限制長度為 30 字元（截斷後再次移除尾部 -）
-    processed_title=$(echo "$processed_title" | cut -c1-30 | sed 's/-$//')
+    # 步驟 7: 限制長度為 30 字元（截斷後移除所有尾部 -）
+    processed_title=$(echo "$processed_title" | cut -c1-30 | sed 's/-*$//')
 
     echo "$processed_title"
 }
@@ -100,9 +100,9 @@ generate_slug() {
     # 步驟 5: 移除開頭和結尾的 -
     title=$(echo "$title" | sed 's/^-//;s/-$//')
 
-    # 步驟 6: 限制長度為 30 字元（截斷後再次移除尾部 -）
+    # 步驟 6: 限制長度為 30 字元（截斷後移除所有尾部 -）
     # 注意：中文字元在 cut 中可能計算不準確，使用 head -c 更精確
-    title=$(echo "$title" | cut -c1-30 | sed 's/-$//')
+    title=$(echo "$title" | cut -c1-30 | sed 's/-*$//')
 
     echo "$title"
 }
