@@ -59,7 +59,7 @@ should_use_beads() {
     local blueprint_file="${1:-.blueprint/blueprint.md}"
     local preference=$(get_beads_preference)
 
-    # 全域設定優先（減少詢問的核心邏輯）
+    # 全域設定優先：enabled/disabled 直接決定，跳過逐次判斷
     if [ "$preference" = "enabled" ]; then
         return 0  # 使用
     elif [ "$preference" = "disabled" ]; then
