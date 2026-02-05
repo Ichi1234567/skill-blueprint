@@ -1,6 +1,7 @@
 ---
 name: blueprint-clarify
 description: 檢查確認邊界，標記難度
+allowed-tools: Read, Edit
 ---
 
 # Blueprint Clarify - 檢查藍圖

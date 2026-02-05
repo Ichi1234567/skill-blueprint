@@ -1,6 +1,7 @@
 ---
 name: blueprint-suspend
 description: 暫停藍圖
+allowed-tools: Read, Bash(source *), Bash(mkdir *), Bash(mv *), Bash(ls *), Bash(date *)
 ---
 
 # Blueprint Suspend - 暫停藍圖

@@ -1,6 +1,7 @@
 ---
 name: blueprint-feat
 description: 建立功能藍圖
+allowed-tools: Read, Glob, Grep, Edit, Write
 ---
 
 # Blueprint Feat - 建立功能藍圖

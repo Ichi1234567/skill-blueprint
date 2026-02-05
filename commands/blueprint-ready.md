@@ -1,6 +1,7 @@
 ---
 name: blueprint-ready
 description: 檢查藍圖狀態，建議下一步
+allowed-tools: Read, Edit, Bash(git rev-parse *), Bash(git branch *), Bash(git checkout *), Bash(bd create *), Bash(bd list *), Bash(bd update *)
 ---
 
 # Blueprint Ready - 檢查狀態
